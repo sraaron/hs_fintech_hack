@@ -47,11 +47,11 @@ def handle_incoming_messages():
 
     max_emot_score = 0
     for tone_cat in tone_cats:
-                if tone['score'] > max_emot_score:
-        if tone_cat['category_id'] == 'emotion_tone':
-            for tone in tone_cat['tones']:
-                    max_emot_score = tone['score']
-                    eeemax_emotion_id = tone['tone_id']
+        if tone['score'] > max_emot_score:
+            if tone_cat['category_id'] == 'emotion_tone':
+                for tone in tone_cat['tones']:
+                        max_emot_score = tone['score']
+                        max_emotion_id = tone['tone_id']
     emotion_context = {"emotion": {"current": max_emotion_id}}
     context["user"] = emotion_context
     response = conversation.message(workspace_id=workspace_id, message_input={'text': message}, context=context)
