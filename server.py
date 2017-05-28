@@ -34,19 +34,31 @@ def reply(user_id, msg):
     resp = requests.post("https://graph.facebook.com/v2.6/me/messages?access_token=" + ACCESS_TOKEN, json=data)
     print(resp.content)
 
+
 @app.route('/', methods=['POST'])
 def handle_incoming_messages():
     data = request.json
     sender = data['entry'][0]['messaging'][0]['sender']['id']
     message = data['entry'][0]['messaging'][0]['message']['text']
     global context
-    tone0 = tone_analyzer.tone(text=message)
-    tone1 = tone_analyzer.tone_chat([{'text': message, 'user': sender}], tones='emotion')
+    tone = tone_analyzer.tone(text=message)
+    max_emotion_id = None
+    tone_cats = tone['document_tone']['tone_categories']
+
+    max_emot_score = 0
+    for tone_cat in tone_cats:
+                if tone['score'] > max_emot_score:
+        if tone_cat['category_id'] == 'emotion_tone':
+            for tone in tone_cat['tones']:
+                    max_emot_score = tone['score']
+                    eeemax_emotion_id = tone['tone_id']
+    emotion_context = {"emotion": {"current": max_emotion_id}}
+    context["user"] = emotion_context
     response = conversation.message(workspace_id=workspace_id, message_input={'text': message}, context=context)
     context = response['context']
     '''
-    max_conf = 0
     max_intent = None
+    max_conf = 0
     for conf, intent in response:
         if conf > max_conf:
             max_conf = conf
